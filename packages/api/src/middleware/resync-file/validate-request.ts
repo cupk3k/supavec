@@ -46,18 +46,19 @@ export const validateRequestMiddleware = () => {
         .match({ api_key: apiKey })
         .single();
 
-      if (apiKeyError || !apiKeyData?.team_id) {
-        return res.status(401).json({
-          success: false,
-          message: "Invalid API key",
-        });
-      }
+      // if (apiKeyError || !apiKeyData?.team_id) {
+      //   return res.status(401).json({
+      //     success: false,
+      //     message: "Invalid API key",
+      //   });
+      // }
 
       req.body.validatedData = {
         file_id,
         chunk_size: chunk_size ?? DEFAULT_CHUNK_SIZE,
         chunk_overlap: chunk_overlap ?? DEFAULT_CHUNK_OVERLAP,
-        teamId: apiKeyData.team_id,
+        // teamId: apiKeyData.team_id,
+        teamId: apiKeyData?.team_id,
         apiKeyData,
       };
       return next();

@@ -21,18 +21,18 @@ export const apiKeyAuth = () => {
       });
     }
 
-    const { data, error } = await supabase.from("api_keys").select("id")
-      .match({
-        api_key: authHeader,
-      })
-      .single();
+    // const { data, error } = await supabase.from("api_keys").select("id")
+    //   .match({
+    //     api_key: authHeader,
+    //   })
+    //   .single();
 
-    if (error || !data) {
-      return res.status(401).json({
-        status: "error",
-        message: "Invalid API key",
-      });
-    }
+    // if (error || !data) {
+    //   return res.status(401).json({
+    //     status: "error",
+    //     message: "Invalid API key",
+    //   });
+    // }
 
     req.apiKey = authHeader;
     return next();

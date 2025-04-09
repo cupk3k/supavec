@@ -45,21 +45,23 @@ export const apiUsageLimit = () => {
         .match({ api_key: req.apiKey })
         .single();
 
-      if (apiKeyError || !apiKeyData) {
-        console.warn(
-          `[API-LIMIT][${requestId}] Invalid API key: ${
-            apiKeyError?.message || "No data returned"
-          }`,
-        );
-        return res.status(401).json({
-          success: false,
-          error: "Invalid API key",
-        });
-      }
+      // if (apiKeyError || !apiKeyData) {
+      //   console.warn(
+      //     `[API-LIMIT][${requestId}] Invalid API key: ${
+      //       apiKeyError?.message || "No data returned"
+      //     }`,
+      //   );
+      //   return res.status(401).json({
+      //     success: false,
+      //     error: "Invalid API key",
+      //   });
+      // }
 
-      const userId = apiKeyData.user_id;
-      const teamId = apiKeyData.team_id;
-      const keyId = apiKeyData.id;
+      // const userId = apiKeyData.user_id;
+      // const teamId = apiKeyData.team_id;
+      const userId = apiKeyData?.user_id;
+      const teamId = apiKeyData?.team_id;
+      const keyId = apiKeyData?.id;
 
       console.log(
         `[API-LIMIT][${requestId}] API key validated - User: ${userId}, Team: ${

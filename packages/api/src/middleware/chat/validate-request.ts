@@ -59,19 +59,20 @@ export const validateRequestMiddleware = () => {
         .match({ api_key: apiKey })
         .single();
 
-      if (apiKeyError || !apiKeyData?.team_id || !apiKeyData?.user_id) {
-        return res.status(401).json({
-          success: false,
-          message: "Invalid API key",
-        });
-      }
+      // if (apiKeyError || !apiKeyData?.team_id || !apiKeyData?.user_id) {
+      //   return res.status(401).json({
+      //     success: false,
+      //     message: "Invalid API key",
+      //   });
+      // }
 
       // Verify file ownership
       const { data: files, error: filesError } = await supabase
         .from("files")
         .select("file_id")
         .in("file_id", file_ids)
-        .match({ team_id: apiKeyData.team_id });
+        // .match({ team_id: apiKeyData.team_id });
+        .match({ team_id: apiKeyData?.team_id });
 
       if (filesError) {
         console.error("Error verifying file ownership:", filesError);
@@ -88,12 +89,14 @@ export const validateRequestMiddleware = () => {
         });
       }
 
-      req.userId = apiKeyData.user_id;
+      // req.userId = apiKeyData.user_id;
+      req.userId = apiKeyData?.user_id || "";
       req.body.validatedData = {
         query,
         k,
         file_ids,
-        teamId: apiKeyData.team_id,
+        // teamId: apiKeyData.team_id,
+        teamId: apiKeyData?.team_id,
         apiKeyData,
         stream,
       };

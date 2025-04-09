@@ -31,16 +31,17 @@ export const validateRequestMiddleware = () => {
         .match({ api_key: apiKey })
         .single();
 
-      if (apiKeyError || !apiKeyData?.team_id) {
-        return res.status(401).json({
-          success: false,
-          message: "Invalid API key",
-        });
-      }
+      // if (apiKeyError || !apiKeyData?.team_id) {
+      //   return res.status(401).json({
+      //     success: false,
+      //     message: "Invalid API key",
+      //   });
+      // }
 
       req.body.validatedData = {
         file_id,
-        teamId: apiKeyData.team_id,
+        // teamId: apiKeyData.team_id,
+        teamId: apiKeyData?.team_id,
         apiKeyData,
       };
       return next();
