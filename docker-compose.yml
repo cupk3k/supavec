@@ -1,0 +1,75 @@
+version: '3.8'
+
+networks:
+  traefik-network:
+    external: true
+
+services:
+  api:
+    container_name: supavec-api
+    build:
+      context: .
+      dockerfile: packages/api/Dockerfile
+      secrets:
+        - dotenv
+    restart: unless-stopped
+    networks:
+      - traefik-network
+    environment:
+      # --- Production Supabase Credentials (REQUIRED) ---
+      - SUPABASE_URL=${SUPABASE_URL}
+      - SUPABASE_SERVICE_ROLE_KEY=${SUPABASE_SERVICE_ROLE_KEY}
+      # --- OpenAI Credentials (REQUIRED) ---
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      # --- Other API Env Vars (Add as needed) ---
+      - UPSTASH_REDIS_REST_URL=${UPSTASH_REDIS_REST_URL}
+      - UPSTASH_REDIS_REST_TOKEN=${UPSTASH_REDIS_REST_TOKEN}
+      - POSTHOG_API_KEY=${POSTHOG_API_KEY}
+      - POSTHOG_HOST=${POSTHOG_HOST}
+      # --- Stripe Product IDs (if using Stripe) ---
+      - NEXT_PUBLIC_STRIPE_PRODUCT_BASIC=${NEXT_PUBLIC_STRIPE_PRODUCT_BASIC}
+      - NEXT_PUBLIC_STRIPE_PRODUCT_ENTERPRISE=${NEXT_PUBLIC_STRIPE_PRODUCT_ENTERPRISE}
+      - PORT=3021 # Ensure API listens on the correct port
+    labels:
+      - "traefik.enable=true"
+      # --- API Routing Rule ---
+      - "traefik.http.routers.supavec-api.rule=Host(`supavec-api.debugged.com.my`)"
+      - "traefik.http.routers.supavec-api.entrypoints=websecure"
+      - "traefik.http.routers.supavec-api.tls.certresolver=letsencrypt"
+      # --- API Service Definition ---
+      - "traefik.http.services.supavec-api.loadbalancer.server.port=3021"
+
+  web:
+    container_name: supavec-web
+    build:
+      context: .
+      dockerfile: apps/web/Dockerfile
+      secrets:
+        - dotenv
+    restart: unless-stopped
+    networks:
+      - traefik-network
+    environment:
+      # --- Public Supabase Credentials (REQUIRED) ---
+      - NEXT_PUBLIC_SUPABASE_URL=${NEXT_PUBLIC_SUPABASE_URL}
+      - NEXT_PUBLIC_SUPABASE_ANON_KEY=${NEXT_PUBLIC_SUPABASE_ANON_KEY}
+      # --- API URL for Frontend (REQUIRED) ---
+      # Use the internal service name and port
+      - NEXT_PUBLIC_API_URL=http://api:3021
+      # --- Other Web Env Vars (Add as needed) ---
+      # - NEXT_PUBLIC_SUPABASE_PROJECT_ID=${NEXT_PUBLIC_SUPABASE_PROJECT_ID}
+      - NEXT_PUBLIC_POSTHOG_KEY=${NEXT_PUBLIC_POSTHOG_KEY}
+      - NEXT_PUBLIC_POSTHOG_HOST=${NEXT_PUBLIC_POSTHOG_HOST}
+      - NEXT_PUBLIC_APP_URL=https://supavec.debugged.com.my # Make sure this matches your actual frontend URL
+    labels:
+      - "traefik.enable=true"
+      # --- Web App Routing Rule ---
+      - "traefik.http.routers.supavec-web.rule=Host(`supavec.debugged.com.my`)"
+      - "traefik.http.routers.supavec-web.entrypoints=websecure"
+      - "traefik.http.routers.supavec-web.tls.certresolver=letsencrypt"
+      # --- Web App Service Definition ---
+      - "traefik.http.services.supavec-web.loadbalancer.server.port=3300"
+
+secrets:
+  dotenv:
+    file: .env
