@@ -7,6 +7,8 @@ export async function updateSession(request: NextRequest) {
     request,
   });
 
+  console.log(`[MIDDLEWARE] Request Path: ${request.nextUrl.pathname}`);
+
   const supabase = createServerClient<Database>(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
@@ -35,6 +37,8 @@ export async function updateSession(request: NextRequest) {
     data: { user },
   } = await supabase.auth.getUser();
 
+  console.log(`[MIDDLEWARE] User fetched: ${user ? user.id : 'null'}`);
+
   if (
     !user &&
     (request.nextUrl.pathname.startsWith("/dashboard") ||
@@ -43,8 +47,11 @@ export async function updateSession(request: NextRequest) {
     // no user, potentially respond by redirecting the user to the login page
     const url = request.nextUrl.clone();
     url.pathname = "/login";
+    console.log(`[MIDDLEWARE] No user, redirecting to: ${url.pathname}`);
     return NextResponse.redirect(url);
   }
+
+  console.log(`[MIDDLEWARE] Allowing request to proceed for path: ${request.nextUrl.pathname}`);
 
   // IMPORTANT: You *must* return the supabaseResponse object as it is.
   // If you're creating a new response object with NextResponse.next() make sure to:
