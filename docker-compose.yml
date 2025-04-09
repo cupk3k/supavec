@@ -69,6 +69,10 @@ services:
       - "traefik.http.routers.supavec-web.tls.certresolver=letsencrypt"
       # --- Web App Service Definition ---
       - "traefik.http.services.supavec-web.loadbalancer.server.port=3300"
+      # --- Middleware to ensure correct protocol header ---
+      - "traefik.http.middlewares.supavec-proto-header.headers.customrequestheaders.X-Forwarded-Proto=https"
+      # --- Apply Middleware to Router ---
+      - "traefik.http.routers.supavec-web.middlewares=supavec-proto-header"
 
 secrets:
   dotenv:
