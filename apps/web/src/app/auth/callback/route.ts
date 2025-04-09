@@ -28,12 +28,24 @@ export async function GET(request: NextRequest) {
     return NextResponse.redirect('/error?message=Missing+App+URL+Config');
   }
 
-  // NOTE: exchangeCodeForSession is removed. The middleware (updateSession)
-  // should handle this automatically when processing the request for this route,
-  // as it uses the @supabase/ssr client which checks for the 'code' param.
+  // Explicitly exchange the code using the server client
+  // which uses @supabase/ssr configured with next/headers cookies()
+  if (code) {
+    console.log("[AUTH_CALLBACK] Code found, attempting exchange..."); // DEBUG LINE
+    const supabase = await createClient();
+    try {
+      await supabase.auth.exchangeCodeForSession(code);
+      console.log("[AUTH_CALLBACK] Code exchange successful (or threw no error)."); // DEBUG LINE
+    } catch (error) {
+      console.error("[AUTH_CALLBACK] Code exchange failed:", error);
+      // Redirect to an error page or login page if exchange fails
+      const errorRedirectUrl = new URL("/login?error=auth_code_exchange_failed", appUrl);
+      return NextResponse.redirect(errorRedirectUrl.toString());
+    }
+  }
 
   // Redirect to the dashboard or the 'next' URL parameter.
-  // The middleware will ensure the user session is valid before allowing access.
+  // The middleware will have processed cookies set by exchangeCodeForSession.
   const redirectUrl = new URL(next, appUrl); // Construct full URL
   console.log(
     `[AUTH_CALLBACK] Code param present? ${!!code}. Redirecting to: ${redirectUrl.toString()}`,
