@@ -49,4 +49,4 @@ ENV HOSTNAME "0.0.0.0"
 
 # Command to start the Next.js production server
 # Use bunx to execute next, listening on port 3020
-CMD ["bunx", "next", "start", "-p", "330"]
+CMD ["bunx", "next", "start", "-p", "3300"]

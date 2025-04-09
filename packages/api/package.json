@@ -7,7 +7,7 @@
   "scripts": {
     "build": "bun build ./src/server.ts --outdir ./dist --target bun",
     "dev": "bun --watch src/server.ts",
-    "start": "bun run src/server.ts",
+    "start": "bun run dist/server.js",
     "lint": "eslint \"src/**/*.ts\"",
     "clean": "rm -rf .turbo node_modules dist"
   },
