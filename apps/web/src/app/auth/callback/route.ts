@@ -13,29 +13,18 @@ if (!appUrl) {
 export async function GET(request: Request) {
   const requestUrl = new URL(request.url);
   console.log("[AUTH_CALLBACK] Request URL:", request.url); // DEBUG LINE
-  console.log("[AUTH_CALLBACK] Calculated Origin:", requestUrl.origin); // DEBUG LINE
   const code = requestUrl.searchParams.get("code");
 
-  const supabase = await createClient();
-
   if (code) {
+    const supabase = await createClient();
     await supabase.auth.exchangeCodeForSession(code);
   }
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  if (!user) {
-    console.log(
-      "[AUTH_CALLBACK] No user found, redirecting to:",
-      `${appUrl}/login`
-    ); // DEBUG LINE
-    return NextResponse.redirect(`${appUrl}/login`);
-  }
-
+  // Redirect to the dashboard regardless. The middleware will handle
+  // protecting the dashboard page based on the session cookie
+  // set by exchangeCodeForSession.
   console.log(
-    "[AUTH_CALLBACK] User found, redirecting to:",
+    "[AUTH_CALLBACK] Code exchanged (if present), redirecting to:",
     `${appUrl}/dashboard`
   ); // DEBUG LINE
   return NextResponse.redirect(`${appUrl}/dashboard`);
