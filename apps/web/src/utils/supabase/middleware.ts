@@ -19,6 +19,7 @@ export async function updateSession(request: NextRequest) {
         },
         setAll(cookiesToSet) {
           cookiesToSet.forEach(({ name, value, options }) => {
+            console.log(`[MIDDLEWARE] Setting cookie: Name=${name}, Value=${value ? value.substring(0, 10) + '...' : 'null'}, Options=`, options);
             // Apply cookies to the *existing* response object
             supabaseResponse.cookies.set(name, value, options);
           });
