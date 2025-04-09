@@ -9,7 +9,7 @@ import { useRouter } from "next/navigation";
 
 export function FileUploadForm({
   submitFile,
-  placeholder = "Drag 'n' drop a PDF, text, or markdown file here (max 20MB), or click to select one",
+  placeholder = "Drag 'n' drop a PDF, TXT, MD, CSV, or DOCX file here (max 20MB), or click to select one",
   callBack,
 }: {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -33,6 +33,10 @@ export function FileUploadForm({
       "application/pdf": [".pdf"],
       "text/plain": [".txt"],
       "text/markdown": [".md"],
+      "text/csv": [".csv"],
+      "application/vnd.openxmlformats-officedocument.wordprocessingml.document": [
+        ".docx",
+      ],
     },
     maxFiles: 1,
   });

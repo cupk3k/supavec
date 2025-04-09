@@ -22,6 +22,7 @@ export async function completeOnboarding(formData: FormData) {
   });
 
   if (error) {
+    console.error("Failed to complete onboarding:", error);
     return {
       error: "Failed to complete onboarding",
     };

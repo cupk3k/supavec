@@ -11,15 +11,19 @@ export const upload = multer({
     file: Express.Multer.File,
     cb: multer.FileFilterCallback,
   ) => {
-    if (
-      file.mimetype === "application/pdf" ||
-      file.mimetype === "text/plain" ||
-      file.mimetype === "text/markdown" ||
-      file.originalname.endsWith(".md")
-    ) {
-      cb(null, true);
+    const allowedExtensions = [".pdf", ".txt", ".md", ".csv", ".docx"];
+    const fileExt = file.originalname
+      .substring(file.originalname.lastIndexOf("."))
+      .toLowerCase();
+
+    if (allowedExtensions.includes(fileExt)) {
+      cb(null, true); // Accept file
     } else {
-      cb(new Error("Only PDF, text, and markdown files are allowed"));
+      cb(
+        new Error(
+          "Invalid file type. Allowed types: PDF, TXT, MD, CSV, DOCX",
+        ),
+      ); // Reject file
     }
   },
 });
